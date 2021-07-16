@@ -21,6 +21,14 @@ static class RTUtil
 {
     public static RenderTexture NewFloat(int w, int h)
       => new RenderTexture(w, h, 0, RenderTextureFormat.RFloat);
+
+    public static RenderTexture NewUAV(int w, int h)
+    {
+        var rt = new RenderTexture(w, h, 0, RenderTextureFormat.R8);
+        rt.enableRandomWrite = true;
+        rt.Create();
+        return rt;
+    }
 }
 
 #endregion

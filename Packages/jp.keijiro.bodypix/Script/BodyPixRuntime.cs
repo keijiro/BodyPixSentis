@@ -28,6 +28,7 @@ public sealed class BodyPixRuntime : System.IDisposable
     IWorker _worker;
 
     (ComputeBuffer preprocess,
+     RenderTexture segment,
      RenderTexture stencil) _buffers;
 
     void AllocateObjects(ResourceSet resources)
@@ -44,7 +45,10 @@ public sealed class BodyPixRuntime : System.IDisposable
         _buffers.preprocess = new ComputeBuffer
           (_config.InputFootprint, sizeof(float));
 
-        _buffers.stencil = RTUtil.NewFloat
+        _buffers.segment = RTUtil.NewFloat
+          (_config.OutputWidth, _config.OutputHeight);
+
+        _buffers.stencil = RTUtil.NewUAV
           (_config.OutputWidth, _config.OutputHeight);
     }
 
@@ -55,6 +59,9 @@ public sealed class BodyPixRuntime : System.IDisposable
 
         _buffers.preprocess?.Dispose();
         _buffers.preprocess = null;
+
+        ObjectUtil.Destroy(_buffers.segment);
+        _buffers.segment = null;
 
         ObjectUtil.Destroy(_buffers.stencil);
         _buffers.stencil = null;
@@ -78,7 +85,14 @@ public sealed class BodyPixRuntime : System.IDisposable
             _worker.Execute(t);
 
         // NN output retrieval
-        _worker.CopyOutput("float_segments", _buffers.stencil);
+        _worker.CopyOutput("float_segments", _buffers.segment);
+
+        // Postprocessing
+        var post = _resources.postprocess;
+        post.SetTexture(0, "Input", _buffers.segment);
+        post.SetTexture(0, "Output", _buffers.stencil);
+        post.SetInts("InputSize", _config.OutputWidth, _config.OutputHeight);
+        post.DispatchThreads(0, _config.OutputWidth, _config.OutputHeight, 1);
     }
 
     #endregion
