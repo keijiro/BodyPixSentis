@@ -7,8 +7,8 @@ public sealed class BodyPixRuntime : System.IDisposable
 {
     #region Public methods/properties
 
-    public BodyPixRuntime(ResourceSet resources)
-      => AllocateObjects(resources);
+    public BodyPixRuntime(ResourceSet resources, int width, int height)
+      => AllocateObjects(resources, width, height);
 
     public void Dispose()
       => DeallocateObjects();
@@ -31,14 +31,14 @@ public sealed class BodyPixRuntime : System.IDisposable
      RenderTexture segment,
      RenderTexture stencil) _buffers;
 
-    void AllocateObjects(ResourceSet resources)
+    void AllocateObjects(ResourceSet resources, int width, int height)
     {
         // NN model loading
         var model = ModelLoader.Load(resources.model);
 
         // Private object initialization
         _resources = resources;
-        _config = new Config(model);
+        _config = new Config(model, _resources, width, height);
         _worker = model.CreateWorker();
 
         // Buffer allocation
@@ -75,9 +75,9 @@ public sealed class BodyPixRuntime : System.IDisposable
     {
         // Preprocessing
         var pre = _resources.preprocess;
-        pre.SetInts("Size", _config.InputWidth, _config.InputHeight);
-        pre.SetTexture(0, "Image", source);
-        pre.SetBuffer(0, "Tensor", _buffers.preprocess);
+        pre.SetTexture(0, "Input", source);
+        pre.SetBuffer(0, "Output", _buffers.preprocess);
+        pre.SetInts("InputSize", _config.InputWidth, _config.InputHeight);
         pre.DispatchThreads(0, _config.InputWidth, _config.InputHeight, 1);
 
         // NN worker invocation
@@ -85,7 +85,7 @@ public sealed class BodyPixRuntime : System.IDisposable
             _worker.Execute(t);
 
         // NN output retrieval
-        _worker.CopyOutput("float_segments", _buffers.segment);
+        _worker.CopyOutput("segments", _buffers.segment);
 
         // Postprocessing
         var post = _resources.postprocess;

@@ -8,6 +8,7 @@ namespace BodyPix {
 public sealed class ResourceSet : ScriptableObject
 {
     public NNModel model;
+    public int stride = 8;
     public ComputeShader preprocess;
     public ComputeShader postprocess;
 }

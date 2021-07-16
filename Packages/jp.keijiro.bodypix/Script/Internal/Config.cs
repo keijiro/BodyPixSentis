@@ -7,6 +7,7 @@ struct Config
 {
     #region Variables from tensor shapes
 
+    public int Stride { get; private set; }
     public int InputWidth { get; private set; }
     public int InputHeight { get; private set; }
     public int OutputWidth { get; private set; }
@@ -29,15 +30,13 @@ struct Config
 
     #region Constructor
 
-    public Config(Model model)
+    public Config(Model model, ResourceSet resources, int width, int height)
     {
-        var inShape = model.inputs[0].shape;
-        var outShape = model.GetShapeByName("float_segments").Value;
-
-        InputWidth = inShape[6]; // 6: width
-        InputHeight = inShape[5]; // 5: height
-        OutputWidth = outShape.width;
-        OutputHeight = outShape.height;
+        Stride = resources.stride;
+        InputWidth  = (width  + 15) / 16 * 16 + 1;
+        InputHeight = (height + 15) / 16 * 16 + 1;
+        OutputWidth  = InputWidth  / Stride + 1;
+        OutputHeight = InputHeight / Stride + 1;
     }
 
     #endregion

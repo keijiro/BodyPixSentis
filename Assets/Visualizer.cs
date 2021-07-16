@@ -13,7 +13,7 @@ sealed class Visualizer : MonoBehaviour
     BodyPixRuntime _bodypix;
 
     void Start()
-      => _bodypix = new BodyPixRuntime(_resources);
+      => _bodypix = new BodyPixRuntime(_resources, 400, 300);
 
     void OnDestroy()
       => _bodypix.Dispose();

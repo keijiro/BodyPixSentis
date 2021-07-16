@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62094df5cdd6f4765bcccbee1a67fe06, type: 3}
   m_Name: BodyPix
   m_EditorClassIdentifier: 
-  model: {fileID: 5022602860645237092, guid: 8487a78c96651414fa9b32677d91359e, type: 3}
+  model: {fileID: 5022602860645237092, guid: ff475820fb5ea4db1b073da3f6892ddb, type: 3}
+  stride: 8
   preprocess: {fileID: 7200000, guid: 065b9d2f5e685444881e88945bf0492b, type: 3}
   postprocess: {fileID: 7200000, guid: c22c946b1ee1744b6b57e01fbedd3fd4, type: 3}
