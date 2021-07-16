@@ -1,0 +1,25 @@
+#pragma kernel Preprocess
+
+sampler2D Image;
+RWStructuredBuffer<float> Tensor;
+uint2 Size;
+
+[numthreads(8, 8, 1)]
+void Preprocess(uint2 id : SV_DispatchThreadID)
+{
+    // UV (vertically flipped)
+    float2 uv = float2(0.5 + id.x, Size.y - 0.5 - id.y) / Size;
+
+    // UV gradients
+    float2 duv_dx = float2(1.0 / Size.x, 0);
+    float2 duv_dy = float2(0, -1.0 / Size.y);
+
+    // Texture sample
+    float3 rgb = tex2Dgrad(Image, uv, duv_dx, duv_dy).rgb * 2 - 1;
+
+    // Tensor element output
+    uint offs = (id.y * Size.x + id.x) * 3;
+    Tensor[offs + 0] = rgb.r;
+    Tensor[offs + 1] = rgb.g;
+    Tensor[offs + 2] = rgb.b;
+}

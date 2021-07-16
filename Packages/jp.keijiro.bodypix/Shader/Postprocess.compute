@@ -1,0 +1,70 @@
+// First stage postprocessing (detection data aggregation)
+
+#pragma kernel Postprocess1
+
+#include "Common.hlsl"
+
+// Input
+Texture2D<float> Input;
+uint InputSize;
+float2 Anchors[ANCHOR_COUNT];
+uint ClassCount;
+float Threshold;
+
+// Output buffer
+RWStructuredBuffer<Detection> Output;
+RWStructuredBuffer<uint> OutputCount; // Only used as a counter
+
+[numthreads(8, 8, 1)]
+void Postprocess1(uint2 id : SV_DispatchThreadID)
+{
+    if (!all(id < InputSize)) return;
+
+    // Input reference point:
+    // We have to read the input tensor in reversed order.
+    uint ref_y = (InputSize - 1 - id.y) * InputSize + (InputSize - 1 - id.x);
+
+    for (uint aidx = 0; aidx < ANCHOR_COUNT; aidx++)
+    {
+        uint ref_x = aidx * (5 + ClassCount);
+
+        // Bounding box / confidence
+        float x = Input[uint2(ref_x + 0, ref_y)];
+        float y = Input[uint2(ref_x + 1, ref_y)];
+        float w = Input[uint2(ref_x + 2, ref_y)];
+        float h = Input[uint2(ref_x + 3, ref_y)];
+        float c = Input[uint2(ref_x + 4, ref_y)];
+
+        // ArgMax[SoftMax[classes]]
+        uint maxClass = 0;
+        float maxScore = exp(Input[uint2(ref_x + 5, ref_y)]);
+        float scoreSum = maxScore;
+        for (uint cidx = 1; cidx < ClassCount; cidx++)
+        {
+            float score = exp(Input[uint2(ref_x + 5 + cidx, ref_y)]);
+            if (score > maxScore)
+            {
+                maxClass = cidx;
+                maxScore = score;
+            }
+            scoreSum += score;
+        }
+
+        // Output structure
+        Detection data;
+        data.x = (id.x + Sigmoid(x)) / InputSize;
+        data.y = (id.y + Sigmoid(y)) / InputSize;
+        data.w = exp(w) * Anchors[aidx].x;
+        data.h = exp(h) * Anchors[aidx].y;
+        data.classIndex = maxClass;
+        data.score = Sigmoid(c) * maxScore / scoreSum;
+
+        // Thresholding
+        if (data.score > Threshold)
+        {
+            // Detected: Count and output
+            uint count = OutputCount.IncrementCounter();
+            if (count < MAX_DETECTION) Output[count] = data;
+        }
+    }
+}

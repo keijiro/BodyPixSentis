@@ -1,0 +1,13 @@
+{
+  "author": "Keijiro Takahashi",
+  "dependencies": { "com.unity.barracuda": "2.1.0-preview" },
+  "description": "Body Pix neural network model for Unity Barracuda.",
+  "displayName": "Body Pix",
+  "keywords": [ "unity" ],
+  "license": "Apache-2.0",
+  "name": "jp.keijiro.bodypix",
+  "repository": "github:keijiro/BodyPixBarracuda",
+  "unity": "2020.3",
+  "unityRelease": "0f1",
+  "version": "0.0.1"
+}
