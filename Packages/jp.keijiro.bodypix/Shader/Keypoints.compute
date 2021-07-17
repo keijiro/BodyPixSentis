@@ -1,0 +1,47 @@
+#pragma kernel PostprocessKeypoints
+
+#include "Common.hlsl"
+
+// Input
+Texture2D<float> Heatmaps;
+Texture2D<float> Offsets;
+uint2 InputSize;
+uint Stride;
+
+// Output
+RWStructuredBuffer<float4> Keypoints;
+
+float SampleHeatmap(uint x, uint y, uint part)
+{
+    return Heatmaps[uint2(x * PART_COUNT + part, y)];
+}
+
+[numthreads(PART_COUNT, 1, 1)]
+void PostprocessKeypoints(uint id : SV_DispatchThreadID)
+{
+    uint2 max_pos = 0;
+    float max_score = 0;
+
+    for (uint v = 0; v < InputSize.y; v++)
+    {
+        for (uint u = 0; u < InputSize.x; u++)
+        {
+            uint2 pos = uint2(u, v);
+            float score = SampleHeatmap(pos.x, pos.y, id);
+            if (score > max_score)
+            {
+                max_pos = pos;
+                max_score = score;
+            }
+        }
+    }
+
+    uint2 base = max_pos * uint2(PART_COUNT * 2, 1);
+    uint2 ix = base + uint2(id + PART_COUNT, 0);
+    uint2 iy = base + uint2(id, 0);
+
+    float2 offs = float2(Offsets[ix], -Offsets[iy]);
+    float2 pos = (max_pos + offs / Stride + 0.5) / InputSize;
+
+    Keypoints[id] = float4(pos, Sigmoid(max_score), 0);
+}

@@ -231,6 +231,7 @@ MonoBehaviour:
   _resolution: {x: 512, y: 384}
   _previewUI: {fileID: 1869171756}
   _stencilUI: {fileID: 55666815}
+  _shader: {fileID: 4800000, guid: 5dd7f5d1206004095a1ccf893c31eac8, type: 3}
 --- !u!114 &251461801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,10 +245,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sourceType: 0
-  _texture: {fileID: 2800000, guid: 76fba715a2ca6427bb834088b1b748db, type: 3}
+  _texture: {fileID: 2800000, guid: 75b2c8951439440f0ae8794aebcbebc1, type: 3}
   _textureUrl: 
   _video: {fileID: 0}
-  _videoUrl: file://Test1.mp4
+  _videoUrl: file://Test2.mp4
   _webcamName: 
   _webcamResolution: {x: 1920, y: 1080}
   _webcamFrameRate: 30
@@ -474,8 +475,8 @@ Canvas:
   m_GameObject: {fileID: 1339821701}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 274663182}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1

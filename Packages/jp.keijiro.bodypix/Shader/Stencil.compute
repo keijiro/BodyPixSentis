@@ -1,4 +1,6 @@
-#pragma kernel Postprocess
+#pragma kernel PostprocessStencil
+
+#include "Common.hlsl"
 
 // Input
 Texture2D<float> Input;
@@ -8,9 +10,9 @@ uint2 InputSize;
 RWTexture2D<float> Output;
 
 [numthreads(8, 8, 1)]
-void Postprocess(uint2 id : SV_DispatchThreadID)
+void PostprocessStencil(uint2 id : SV_DispatchThreadID)
 {
     if (!all(id < InputSize)) return;
 
-    Output[id] = 1 / (1 + exp(-Input[id]));
+    Output[id] = Sigmoid(Input[id]);
 }
