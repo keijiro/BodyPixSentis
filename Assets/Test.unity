@@ -231,7 +231,8 @@ MonoBehaviour:
   _resolution: {x: 512, y: 384}
   _previewUI: {fileID: 1869171756}
   _stencilUI: {fileID: 55666815}
-  _shader: {fileID: 4800000, guid: 5dd7f5d1206004095a1ccf893c31eac8, type: 3}
+  _keypointShader: {fileID: 4800000, guid: 5dd7f5d1206004095a1ccf893c31eac8, type: 3}
+  _boneShader: {fileID: 4800000, guid: 613147133d6324d749fc5d528d8a5ab7, type: 3}
 --- !u!114 &251461801
 MonoBehaviour:
   m_ObjectHideFlags: 0
