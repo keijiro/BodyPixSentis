@@ -11,12 +11,12 @@ uint Stride;
 // Output
 RWStructuredBuffer<float4> Keypoints;
 
-float SampleHeatmap(uint x, uint y, uint part)
+float SampleHeatmap(uint x, uint y, uint index)
 {
-    return Heatmaps[uint2(x * PART_COUNT + part, y)];
+    return Heatmaps[uint2(x * KEYPOINT_COUNT + index, y)];
 }
 
-[numthreads(PART_COUNT, 1, 1)]
+[numthreads(KEYPOINT_COUNT, 1, 1)]
 void PostprocessKeypoints(uint id : SV_DispatchThreadID)
 {
     uint2 max_pos = 0;
@@ -36,8 +36,8 @@ void PostprocessKeypoints(uint id : SV_DispatchThreadID)
         }
     }
 
-    uint2 base = max_pos * uint2(PART_COUNT * 2, 1);
-    uint2 ix = base + uint2(id + PART_COUNT, 0);
+    uint2 base = max_pos * uint2(KEYPOINT_COUNT * 2, 1);
+    uint2 ix = base + uint2(id + KEYPOINT_COUNT, 0);
     uint2 iy = base + uint2(id, 0);
 
     float2 offs = float2(Offsets[ix], -Offsets[iy]);

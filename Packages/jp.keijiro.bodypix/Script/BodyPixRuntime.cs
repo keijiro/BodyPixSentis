@@ -7,7 +7,8 @@ public sealed class BodyPixRuntime : System.IDisposable
 {
     #region Public methods/properties
 
-    public const int PartCount = 17;
+    public const int PartCount = 24;
+    public const int KeypointCount = 17;
 
     public BodyPixRuntime(ResourceSet resources, int width, int height)
       => AllocateObjects(resources, width, height);
@@ -18,8 +19,8 @@ public sealed class BodyPixRuntime : System.IDisposable
     public void ProcessImage(Texture sourceTexture)
       => RunModel(sourceTexture);
 
-    public RenderTexture Stencil
-      => _buffers.stencil;
+    public RenderTexture Mask
+      => _buffers.mask;
 
     public ComputeBuffer Keypoints
       => _buffers.keypoints;
@@ -34,9 +35,10 @@ public sealed class BodyPixRuntime : System.IDisposable
 
     (ComputeBuffer preprocess,
      RenderTexture segment,
+     RenderTexture parts,
      RenderTexture heatmaps,
      RenderTexture offsets,
-     RenderTexture stencil,
+     RenderTexture mask,
      ComputeBuffer keypoints) _buffers;
 
     void AllocateObjects(ResourceSet resources, int width, int height)
@@ -56,17 +58,20 @@ public sealed class BodyPixRuntime : System.IDisposable
         _buffers.segment = RTUtil.NewFloat
           (_config.OutputWidth, _config.OutputHeight);
 
+        _buffers.parts = RTUtil.NewFloat
+          (_config.OutputWidth * 24, _config.OutputHeight);
+
         _buffers.heatmaps = RTUtil.NewFloat
-          (_config.OutputWidth * PartCount, _config.OutputHeight);
+          (_config.OutputWidth * KeypointCount, _config.OutputHeight);
 
         _buffers.offsets = RTUtil.NewFloat
-          (_config.OutputWidth * PartCount * 2, _config.OutputHeight);
+          (_config.OutputWidth * KeypointCount * 2, _config.OutputHeight);
 
-        _buffers.stencil = RTUtil.NewUAV
+        _buffers.mask = RTUtil.NewArgbUav
           (_config.OutputWidth, _config.OutputHeight);
 
         _buffers.keypoints = new ComputeBuffer
-          (PartCount, sizeof(float) * 4);
+          (KeypointCount, sizeof(float) * 4);
     }
 
     void DeallocateObjects()
@@ -80,14 +85,17 @@ public sealed class BodyPixRuntime : System.IDisposable
         ObjectUtil.Destroy(_buffers.segment);
         _buffers.segment = null;
 
+        ObjectUtil.Destroy(_buffers.parts);
+        _buffers.parts = null;
+
         ObjectUtil.Destroy(_buffers.heatmaps);
         _buffers.heatmaps = null;
 
         ObjectUtil.Destroy(_buffers.offsets);
         _buffers.offsets = null;
 
-        ObjectUtil.Destroy(_buffers.stencil);
-        _buffers.stencil = null;
+        ObjectUtil.Destroy(_buffers.mask);
+        _buffers.mask = null;
 
         _buffers.keypoints?.Dispose();
         _buffers.keypoints = null;
@@ -112,13 +120,15 @@ public sealed class BodyPixRuntime : System.IDisposable
 
         // NN output retrieval
         _worker.CopyOutput("segments", _buffers.segment);
+        _worker.CopyOutput("part_heatmaps", _buffers.parts);
         _worker.CopyOutput("heatmaps", _buffers.heatmaps);
         _worker.CopyOutput("short_offsets", _buffers.offsets);
 
-        // Postprocessing (stencil)
-        var post = _resources.stencil;
-        post.SetTexture(0, "Input", _buffers.segment);
-        post.SetTexture(0, "Output", _buffers.stencil);
+        // Postprocessing (mask)
+        var post = _resources.mask;
+        post.SetTexture(0, "Segments", _buffers.segment);
+        post.SetTexture(0, "Heatmaps", _buffers.parts);
+        post.SetTexture(0, "Output", _buffers.mask);
         post.SetInts("InputSize", _config.OutputWidth, _config.OutputHeight);
         post.DispatchThreads(0, _config.OutputWidth, _config.OutputHeight, 1);
 
