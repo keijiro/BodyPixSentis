@@ -15,14 +15,14 @@ void PostprocessMask(uint2 id : SV_DispatchThreadID)
 {
     if (!all(id < InputSize)) return;
 
-    float s = Sigmoid(Segments[id]);
+    float s = BodyPix_Sigmoid(Segments[id]);
 
-    float max_h = Heatmaps[id * uint2(24, 1)];
+    float max_h = Heatmaps[id * uint2(BODYPIX_PART_COUNT, 1)];
     uint max_i = 0;
 
-    for (uint i = 1; i < 24; i++)
+    for (uint i = 1; i < BODYPIX_PART_COUNT; i++)
     {
-        float h = Heatmaps[uint2(id.x * 24 + i, id.y)];
+        float h = Heatmaps[uint2(id.x * BODYPIX_PART_COUNT + i, id.y)];
         if (h > max_h)
         {
             max_h = h;
@@ -30,7 +30,5 @@ void PostprocessMask(uint2 id : SV_DispatchThreadID)
         }
     }
 
-    float hue = max_i / 24.0;
-
-    Output[id] = float4(HueToRGB(hue), s);
+    Output[id] = float4((float3)max_i / BODYPIX_PART_COUNT, s);
 }

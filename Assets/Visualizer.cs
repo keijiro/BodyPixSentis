@@ -14,24 +14,32 @@ sealed class Visualizer : MonoBehaviour
 
     BodyPixRuntime _bodypix;
     Material _material;
+    RenderTexture _mask;
 
     void Start()
     {
         _bodypix = new BodyPixRuntime(_resources, _resolution.x, _resolution.y);
+
         _material = new Material(_shader);
+
+        var reso = _source.OutputResolution;
+        _mask = new RenderTexture(reso.x, reso.y, 0);
+        _maskUI.texture = _mask;
     }
 
     void OnDestroy()
     {
         _bodypix.Dispose();
         Destroy(_material);
+        Destroy(_mask);
     }
 
     void LateUpdate()
     {
         _bodypix.ProcessImage(_source.Texture);
         _previewUI.texture = _source.Texture;
-        _maskUI.texture = _bodypix.Mask;
+
+        Graphics.Blit(_bodypix.Mask, _mask, _material, 0);
     }
 
     void OnRenderObject()
@@ -39,11 +47,11 @@ sealed class Visualizer : MonoBehaviour
         _material.SetBuffer("_Keypoints", _bodypix.Keypoints);
         _material.SetFloat("_Aspect", (float)_resolution.x / _resolution.y);
 
-        _material.SetPass(0);
+        _material.SetPass(1);
         Graphics.DrawProceduralNow
           (MeshTopology.Triangles, 6, BodyPixRuntime.KeypointCount);
 
-        _material.SetPass(1);
+        _material.SetPass(2);
         Graphics.DrawProceduralNow(MeshTopology.Lines, 2, 12);
     }
 }

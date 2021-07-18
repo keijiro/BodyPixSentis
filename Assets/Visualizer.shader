@@ -1,30 +1,63 @@
 Shader "Hidden/BodyPix/Visualizer"
 {
+    Properties
+    {
+        _MainTex("", 2D) = "black" {}
+    }
+
     CGINCLUDE
 
     #include "UnityCG.cginc"
     #include "Packages/jp.keijiro.bodypix/Shader/Common.hlsl"
 
+    float3 HueToRGB(float h)
+    {
+        h = frac(saturate(h)) * 6 - 2;
+        return saturate(float3(abs(h - 1) - 1, 2 - abs(h), 2 - abs(h - 2)));
+    }
+
+    //
+    // Mask
+    //
+
+    texture2D _MainTex;
+    float4 _MainTex_TexelSize;
+
+    void VertexMask(float4 position : POSITION,
+                    float2 texCoord : TEXCOORD,
+                    out float4 outPosition : SV_Position,
+                    out float2 outTexCoord : TEXCOORD)
+    {
+        outPosition = UnityObjectToClipPos(position);
+        outTexCoord = texCoord;
+    }
+
+    float4 FragmentMask(float4 position : SV_Position,
+                        float2 texCoord : TEXCOORD) : SV_Target
+    {
+        BodyPix_Mask mask =
+          BodyPix_SampleMask(texCoord, _MainTex, _MainTex_TexelSize.zw);
+
+        float3 acc = 0;
+        for (uint part = 0; part < BODYPIX_PART_COUNT; part++)
+        {
+            float score = BodyPix_EvalPart(mask, part);
+            score = smoothstep(0.47, 0.57, score);
+            acc += HueToRGB((float)part / BODYPIX_PART_COUNT) * score;
+        }
+
+        float alpha = BodyPix_EvalSegmentation(mask);
+        alpha = smoothstep(0.47, 0.57, alpha);
+
+        return float4(acc, alpha);
+    }
+
+    //
+    // Keypoints
+    //
+
     StructuredBuffer<float4> _Keypoints;
     float _Aspect;
-
-    static const uint bone_connections[12][2] =
-    {
-        { KEYPOINT_LEFT_HIP,        KEYPOINT_LEFT_SHOULDER  },
-        { KEYPOINT_LEFT_ELBOW,      KEYPOINT_LEFT_SHOULDER  },
-        { KEYPOINT_LEFT_ELBOW,      KEYPOINT_LEFT_WRIST     },
-        { KEYPOINT_LEFT_HIP,        KEYPOINT_LEFT_KNEE      },
-        { KEYPOINT_LEFT_KNEE,       KEYPOINT_LEFT_ANKLE     },
-
-        { KEYPOINT_RIGHT_HIP,       KEYPOINT_RIGHT_SHOULDER },
-        { KEYPOINT_RIGHT_ELBOW,     KEYPOINT_RIGHT_SHOULDER },
-        { KEYPOINT_RIGHT_ELBOW,     KEYPOINT_RIGHT_WRIST    },
-        { KEYPOINT_RIGHT_HIP,       KEYPOINT_RIGHT_KNEE     },
-        { KEYPOINT_RIGHT_KNEE,      KEYPOINT_RIGHT_ANKLE    },
-
-        { KEYPOINT_LEFT_SHOULDER,   KEYPOINT_RIGHT_SHOULDER },
-        { KEYPOINT_LEFT_HIP,        KEYPOINT_RIGHT_HIP      }
-    };
 
     void VertexKeypoints(uint vid : SV_VertexID,
                          uint iid : SV_InstanceID,
@@ -58,6 +91,28 @@ Shader "Hidden/BodyPix/Visualizer"
         return color;
     }
 
+    //
+    // Bones
+    //
+
+    static const uint bone_connections[12][2] =
+    {
+        { BODYPIX_KEYPOINT_LEFT_HIP,        BODYPIX_KEYPOINT_LEFT_SHOULDER  },
+        { BODYPIX_KEYPOINT_LEFT_ELBOW,      BODYPIX_KEYPOINT_LEFT_SHOULDER  },
+        { BODYPIX_KEYPOINT_LEFT_ELBOW,      BODYPIX_KEYPOINT_LEFT_WRIST     },
+        { BODYPIX_KEYPOINT_LEFT_HIP,        BODYPIX_KEYPOINT_LEFT_KNEE      },
+        { BODYPIX_KEYPOINT_LEFT_KNEE,       BODYPIX_KEYPOINT_LEFT_ANKLE     },
+
+        { BODYPIX_KEYPOINT_RIGHT_HIP,       BODYPIX_KEYPOINT_RIGHT_SHOULDER },
+        { BODYPIX_KEYPOINT_RIGHT_ELBOW,     BODYPIX_KEYPOINT_RIGHT_SHOULDER },
+        { BODYPIX_KEYPOINT_RIGHT_ELBOW,     BODYPIX_KEYPOINT_RIGHT_WRIST    },
+        { BODYPIX_KEYPOINT_RIGHT_HIP,       BODYPIX_KEYPOINT_RIGHT_KNEE     },
+        { BODYPIX_KEYPOINT_RIGHT_KNEE,      BODYPIX_KEYPOINT_RIGHT_ANKLE    },
+
+        { BODYPIX_KEYPOINT_LEFT_SHOULDER,   BODYPIX_KEYPOINT_RIGHT_SHOULDER },
+        { BODYPIX_KEYPOINT_LEFT_HIP,        BODYPIX_KEYPOINT_RIGHT_HIP      }
+    };
+
     void VertexBones(uint vid : SV_VertexID,
                      uint iid : SV_InstanceID,
                      out float4 position : SV_Position,
@@ -86,7 +141,15 @@ Shader "Hidden/BodyPix/Visualizer"
 
     SubShader
     {
-        Tags { "Queue"="Overlay+100" }
+        Pass
+        {
+            ZTest Always ZWrite Off Cull Off
+            CGPROGRAM
+            #pragma vertex VertexMask
+            #pragma fragment FragmentMask
+            ENDCG
+        }
+
         Pass
         {
             ZTest Always ZWrite Off Cull Off
