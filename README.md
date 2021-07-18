@@ -1,6 +1,9 @@
 BodyPixBarracuda
 ================
 
+![gif](https://user-images.githubusercontent.com/343936/126066328-9bb01b01-d16f-4a38-8b7e-fb463bd0aac2.gif)
+![gif](https://user-images.githubusercontent.com/343936/126066334-c8d7ea3f-a1b2-49c0-b094-cf55d8f80610.gif)
+
 **BodyPixBarracuda** is an implementation of the [BodyPix] person segmentation and pose estimation model
 that runs on the [Unity Barracuda] neural network inference library.
 
