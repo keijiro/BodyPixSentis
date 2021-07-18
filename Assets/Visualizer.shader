@@ -69,19 +69,16 @@ Shader "Hidden/BodyPix/Visualizer"
         const float threshold = 0.5;
         float alpha = saturate((key.z - threshold) / (1 - threshold));
 
-        float x = lerp(-1, 1, key.x) / _Aspect;
-        float y = lerp(-1, 1, key.y);
+        float x = lerp(-0.5, 0.5, key.x) * _Aspect;
+        float y = lerp(-0.5, 0.5, key.y);
 
-        float vx = lerp(-1, 1, vid & 1);
-        float vy = lerp(-1, 1, vid < 2 || vid == 5);
+        float vx = lerp(-0.5, 0.5, vid & 1);
+        float vy = lerp(-0.5, 0.5, vid < 2 || vid == 5);
 
-        vx *= 0.015 * _ScreenParams.y / _ScreenParams.x;
-        vy *= 0.015;
+        vx *= 0.015 * alpha;
+        vy *= 0.015 * alpha;
 
-        vx *= alpha;
-        vy *= alpha;
-
-        position = float4(x + vx, y + vy, 1, 1);
+        position = UnityObjectToClipPos(float4(x + vx, y + vy, 1, 1));
         color = float4(1, 1, 0, alpha);
     }
 
@@ -120,13 +117,13 @@ Shader "Hidden/BodyPix/Visualizer"
     {
         float4 key = _Keypoints[bone_connections[iid][vid]];
 
-        float x = lerp(-1, 1, key.x) / _Aspect;
-        float y = lerp(-1, 1, key.y);
+        float x = lerp(-0.5, 0.5, key.x) * _Aspect;
+        float y = lerp(-0.5, 0.5, key.y);
 
         const float threshold = 0.5;
         bool mask = key.z > threshold;
 
-        position = float4(x, y, 1, 1);
+        position = UnityObjectToClipPos(float4(x, y, 1, 1));
         color = float4(1, 1, 0, mask);
     }
 

@@ -10,6 +10,7 @@ sealed class Visualizer : MonoBehaviour
     [SerializeField] Vector2Int _resolution = new Vector2Int(512, 384);
     [SerializeField] RawImage _previewUI = null;
     [SerializeField] RawImage _maskUI = null;
+    [SerializeField] bool _drawSkeleton = false;
     [SerializeField] Shader _shader = null;
 
     BodyPixRuntime _bodypix;
@@ -44,6 +45,8 @@ sealed class Visualizer : MonoBehaviour
 
     void OnRenderObject()
     {
+        if (!_drawSkeleton) return;
+
         _material.SetBuffer("_Keypoints", _bodypix.Keypoints);
         _material.SetFloat("_Aspect", (float)_resolution.x / _resolution.y);
 
