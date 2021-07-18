@@ -26,4 +26,10 @@ float Sigmoid(float x)
     return 1 / (1 + exp(-x));
 }
 
+float3 HueToRGB(float h)
+{
+    h = frac(saturate(h)) * 6 - 2;
+    return saturate(float3(abs(h - 1) - 1, 2 - abs(h), 2 - abs(h - 2)));
+}
+
 #endif

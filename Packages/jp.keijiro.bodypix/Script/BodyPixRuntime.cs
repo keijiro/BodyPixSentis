@@ -8,6 +8,7 @@ public sealed class BodyPixRuntime : System.IDisposable
     #region Public methods/properties
 
     public const int PartCount = 24;
+
     public const int KeypointCount = 17;
 
     public BodyPixRuntime(ResourceSet resources, int width, int height)
@@ -125,21 +126,21 @@ public sealed class BodyPixRuntime : System.IDisposable
         _worker.CopyOutput("short_offsets", _buffers.offsets);
 
         // Postprocessing (mask)
-        var post = _resources.mask;
-        post.SetTexture(0, "Segments", _buffers.segment);
-        post.SetTexture(0, "Heatmaps", _buffers.parts);
-        post.SetTexture(0, "Output", _buffers.mask);
-        post.SetInts("InputSize", _config.OutputWidth, _config.OutputHeight);
-        post.DispatchThreads(0, _config.OutputWidth, _config.OutputHeight, 1);
+        var post1 = _resources.mask;
+        post1.SetTexture(0, "Segments", _buffers.segment);
+        post1.SetTexture(0, "Heatmaps", _buffers.parts);
+        post1.SetTexture(0, "Output", _buffers.mask);
+        post1.SetInts("InputSize", _config.OutputWidth, _config.OutputHeight);
+        post1.DispatchThreads(0, _config.OutputWidth, _config.OutputHeight, 1);
 
         // Postprocessing (keypoints)
-        post = _resources.keypoints;
-        post.SetTexture(0, "Heatmaps", _buffers.heatmaps);
-        post.SetTexture(0, "Offsets", _buffers.offsets);
-        post.SetInts("InputSize", _config.OutputWidth, _config.OutputHeight);
-        post.SetInt("Stride", _config.Stride);
-        post.SetBuffer(0, "Keypoints", _buffers.keypoints);
-        post.Dispatch(0, 1, 1, 1);
+        var post2 = _resources.keypoints;
+        post2.SetTexture(0, "Heatmaps", _buffers.heatmaps);
+        post2.SetTexture(0, "Offsets", _buffers.offsets);
+        post2.SetInts("InputSize", _config.OutputWidth, _config.OutputHeight);
+        post2.SetInt("Stride", _config.Stride);
+        post2.SetBuffer(0, "Keypoints", _buffers.keypoints);
+        post2.Dispatch(0, 1, 1, 1);
     }
 
     #endregion

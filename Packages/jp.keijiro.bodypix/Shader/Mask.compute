@@ -30,9 +30,7 @@ void PostprocessMask(uint2 id : SV_DispatchThreadID)
         }
     }
 
-    float h = max_i / 24.0;
-    h = frac(saturate(h)) * 6 - 2;
-    half3 rgb = saturate(half3(abs(h - 1) - 1, 2 - abs(h), 2 - abs(h - 2)));
+    float hue = max_i / 24.0;
 
-    Output[id] = float4(rgb, s);
+    Output[id] = float4(HueToRGB(hue), s);
 }
