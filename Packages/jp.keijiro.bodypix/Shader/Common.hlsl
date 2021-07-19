@@ -54,6 +54,13 @@ float BodyPix_Sigmoid(float x)
     return 1 / (1 + exp(-x));
 }
 
+// Color space conversion between sRGB and linear space.
+// http://chilliant.blogspot.com/2012/08/srgb-approximations-for-hlsl.html
+float3 BodyPix_LinearToSRGB(float3 c)
+{
+    return max(1.055 * pow(saturate(c), 0.416666667) - 0.055, 0.0);
+}
+
 //
 // BodyPix mask data helpers
 //

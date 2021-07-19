@@ -1,8 +1,11 @@
 #pragma kernel Preprocess
 
+#include "Common.hlsl"
+
 // Input
 sampler2D Input;
 uint2 InputSize;
+bool InputIsLinear;
 
 // Output
 RWStructuredBuffer<float> Output;
@@ -20,7 +23,9 @@ void Preprocess(uint2 id : SV_DispatchThreadID)
     float2 duv_dy = float2(0, -1.0 / InputSize.y);
 
     // Texture sample
-    float3 rgb = tex2Dgrad(Input, uv, duv_dx, duv_dy).rgb * 2 - 1;
+    float3 rgb = tex2Dgrad(Input, uv, duv_dx, duv_dy).rgb;
+    if (InputIsLinear) rgb = BodyPix_LinearToSRGB(rgb);
+    rgb = rgb * 2 - 1;
 
     // Tensor element output
     uint offs = (id.y * InputSize.x + id.x) * 3;

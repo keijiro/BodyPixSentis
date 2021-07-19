@@ -13,7 +13,11 @@ Shader "Hidden/BodyPix/Visualizer"
     float3 HueToRGB(float h)
     {
         h = frac(saturate(h)) * 6 - 2;
-        return saturate(float3(abs(h - 1) - 1, 2 - abs(h), 2 - abs(h - 2)));
+        float3 c = saturate(float3(abs(h - 1) - 1, 2 - abs(h), 2 - abs(h - 2)));
+        #ifndef UNITY_COLORSPACE_GAMMA
+        c = GammaToLinearSpace(c);
+        #endif
+        return c;
     }
 
     //

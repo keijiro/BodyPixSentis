@@ -24,11 +24,18 @@ static class RTUtil
 
     public static RenderTexture NewArgbUav(int w, int h)
     {
-        var rt = new RenderTexture(w, h, 0);
+        var rt = new RenderTexture
+          (w, h, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
         rt.enableRandomWrite = true;
         rt.Create();
         return rt;
     }
+}
+
+static class ColorUtil
+{
+    public static bool IsLinear
+      => QualitySettings.activeColorSpace == ColorSpace.Linear;
 }
 
 #endregion

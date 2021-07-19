@@ -113,6 +113,7 @@ public sealed class BodyPixRuntime : System.IDisposable
         pre.SetTexture(0, "Input", source);
         pre.SetBuffer(0, "Output", _buffers.preprocess);
         pre.SetInts("InputSize", _config.InputWidth, _config.InputHeight);
+        pre.SetBool("InputIsLinear", ColorUtil.IsLinear);
         pre.DispatchThreads(0, _config.InputWidth, _config.InputHeight, 1);
 
         // NN worker invocation
