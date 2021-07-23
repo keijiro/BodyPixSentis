@@ -23,7 +23,7 @@ public sealed class BodyPixRuntime : System.IDisposable
     public RenderTexture Mask
       => _buffers.mask;
 
-    public ComputeBuffer Keypoints
+    public GraphicsBuffer Keypoints
       => _buffers.keypoints;
 
     #endregion
@@ -40,7 +40,7 @@ public sealed class BodyPixRuntime : System.IDisposable
      RenderTexture heatmaps,
      RenderTexture offsets,
      RenderTexture mask,
-     ComputeBuffer keypoints) _buffers;
+     GraphicsBuffer keypoints) _buffers;
 
     void AllocateObjects(ResourceSet resources, int width, int height)
     {
@@ -71,8 +71,9 @@ public sealed class BodyPixRuntime : System.IDisposable
         _buffers.mask = RTUtil.NewArgbUav
           (_config.OutputWidth, _config.OutputHeight);
 
-        _buffers.keypoints = new ComputeBuffer
-          (KeypointCount, sizeof(float) * 4);
+        _buffers.keypoints = new GraphicsBuffer
+          (GraphicsBuffer.Target.Structured,
+           KeypointCount, sizeof(float) * 4);
     }
 
     void DeallocateObjects()
