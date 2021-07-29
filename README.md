@@ -25,3 +25,43 @@ See [the Colab notebook] for further details.
 [tf2onnx]: https://github.com/onnx/tensorflow-onnx
 [the Colab notebook]:
   https://colab.research.google.com/drive/1ikOMoqOX7TSBNId0lGaQ_kIyDF2GV3M3?usp=sharing
+
+How to install
+--------------
+
+This package uses the [scoped registry] feature to resolve package dependencies.
+Please add the following sections to the manifest file (Packages/manifest.json).
+
+[scoped registry]: https://docs.unity3d.com/Manual/upm-scoped.html
+
+To the `scopedRegistries` section:
+
+```
+{
+  "name": "Keijiro",
+  "url": "https://registry.npmjs.com",
+  "scopes": [ "jp.keijiro" ]
+}
+```
+
+To the `dependencies` section:
+
+```
+"jp.keijiro.bodypix": "1.0.3"
+```
+
+After changes, the manifest file should look like below:
+
+```
+{
+  "scopedRegistries": [
+    {
+      "name": "Keijiro",
+      "url": "https://registry.npmjs.com",
+      "scopes": [ "jp.keijiro" ]
+    }
+  ],
+  "dependencies": {
+    "jp.keijiro.bodypix": "1.0.3",
+...
+```
