@@ -5,6 +5,7 @@
 // Input
 sampler2D Input;
 uint2 InputSize;
+float4 ColorCoeffs;
 bool InputIsLinear;
 
 // Output
@@ -25,7 +26,7 @@ void Preprocess(uint2 id : SV_DispatchThreadID)
     // Texture sample
     float3 rgb = tex2Dgrad(Input, uv, duv_dx, duv_dy).rgb;
     if (InputIsLinear) rgb = BodyPix_LinearToSRGB(rgb);
-    rgb = rgb * 2 - 1;
+    rgb = rgb * ColorCoeffs.w + ColorCoeffs.xyz;
 
     // Tensor element output
     uint offs = (id.y * InputSize.x + id.x) * 3;

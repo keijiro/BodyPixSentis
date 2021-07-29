@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62094df5cdd6f4765bcccbee1a67fe06, type: 3}
+  m_Name: MobileNetV1-x075-stride16
+  m_EditorClassIdentifier: 
+  model: {fileID: 5022602860645237092, guid: 6be5a816af0104891ba9bfb808b6fe7c, type: 3}
+  architecture: 0
+  stride: 16
+  preprocess: {fileID: 7200000, guid: 065b9d2f5e685444881e88945bf0492b, type: 3}
+  mask: {fileID: 7200000, guid: c22c946b1ee1744b6b57e01fbedd3fd4, type: 3}
+  keypoints: {fileID: 7200000, guid: 7f8a40b27a6624527831abb31e5be62b, type: 3}
