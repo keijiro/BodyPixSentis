@@ -43,5 +43,5 @@ void PostprocessKeypoints(uint id : SV_DispatchThreadID)
     float2 offs = float2(Offsets[ix], -Offsets[iy]);
     float2 pos = (max_pos + offs / Stride + 0.5) / InputSize;
 
-    Keypoints[id] = float4(pos, BodyPix_Sigmoid(max_score), 0);
+    Keypoints[id] = float4(pos, max_score, 0);
 }

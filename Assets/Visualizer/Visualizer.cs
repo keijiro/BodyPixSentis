@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using Klak.TestTools;
 using BodyPix;
 
-sealed class Visualizer : MonoBehaviour
+public sealed class Visualizer : MonoBehaviour
 {
     [SerializeField] ImageSource _source = null;
     [SerializeField] ResourceSet _resources = null;
@@ -13,13 +13,13 @@ sealed class Visualizer : MonoBehaviour
     [SerializeField] bool _drawSkeleton = false;
     [SerializeField] Shader _shader = null;
 
-    BodyPixRuntime _bodypix;
+    BodyDetector _detector;
     Material _material;
     RenderTexture _mask;
 
     void Start()
     {
-        _bodypix = new BodyPixRuntime(_resources, _resolution.x, _resolution.y);
+        _detector = new BodyDetector(_resources, _resolution.x, _resolution.y);
 
         _material = new Material(_shader);
 
@@ -30,29 +30,29 @@ sealed class Visualizer : MonoBehaviour
 
     void OnDestroy()
     {
-        _bodypix.Dispose();
+        _detector.Dispose();
         Destroy(_material);
         Destroy(_mask);
     }
 
     void LateUpdate()
     {
-        _bodypix.ProcessImage(_source.Texture);
+        _detector.ProcessImage(_source.Texture);
         _previewUI.texture = _source.Texture;
 
-        Graphics.Blit(_bodypix.MaskTexture, _mask, _material, 0);
+        Graphics.Blit(_detector.MaskTexture, _mask, _material, 0);
     }
 
     void OnRenderObject()
     {
         if (!_drawSkeleton) return;
 
-        _material.SetBuffer("_Keypoints", _bodypix.KeypointBuffer);
+        _material.SetBuffer("_Keypoints", _detector.KeypointBuffer);
         _material.SetFloat("_Aspect", (float)_resolution.x / _resolution.y);
 
         _material.SetPass(1);
         Graphics.DrawProceduralNow
-          (MeshTopology.Triangles, 6, BodyPixRuntime.KeypointCount);
+          (MeshTopology.Triangles, 6, Body.KeypointCount);
 
         _material.SetPass(2);
         Graphics.DrawProceduralNow(MeshTopology.Lines, 2, 12);

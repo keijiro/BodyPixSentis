@@ -1,17 +1,14 @@
+using System.Collections.Generic;
 using Unity.Barracuda;
 using UnityEngine;
 
 namespace BodyPix {
 
-public sealed class BodyPixRuntime : System.IDisposable
+public sealed class BodyDetector : System.IDisposable
 {
     #region Public methods/properties
 
-    public const int PartCount = 24;
-
-    public const int KeypointCount = 17;
-
-    public BodyPixRuntime(ResourceSet resources, int width, int height)
+    public BodyDetector(ResourceSet resources, int width, int height)
       => AllocateObjects(resources, width, height);
 
     public void Dispose()
@@ -19,6 +16,9 @@ public sealed class BodyPixRuntime : System.IDisposable
 
     public void ProcessImage(Texture sourceTexture)
       => RunModel(sourceTexture);
+
+    public IEnumerable<Keypoint> Keypoints
+      => _readCache.Cached;
 
     public RenderTexture MaskTexture
       => _buffers.mask;
@@ -42,6 +42,8 @@ public sealed class BodyPixRuntime : System.IDisposable
      RenderTexture mask,
      GraphicsBuffer keypoints) _buffers;
 
+    KeypointCache _readCache;
+
     void AllocateObjects(ResourceSet resources, int width, int height)
     {
         // NN model loading
@@ -63,17 +65,20 @@ public sealed class BodyPixRuntime : System.IDisposable
           (_config.OutputWidth * 24, _config.OutputHeight);
 
         _buffers.heatmaps = RTUtil.NewFloat
-          (_config.OutputWidth * KeypointCount, _config.OutputHeight);
+          (_config.OutputWidth * Body.KeypointCount, _config.OutputHeight);
 
         _buffers.offsets = RTUtil.NewFloat
-          (_config.OutputWidth * KeypointCount * 2, _config.OutputHeight);
+          (_config.OutputWidth * Body.KeypointCount * 2, _config.OutputHeight);
 
         _buffers.mask = RTUtil.NewArgbUav
           (_config.OutputWidth, _config.OutputHeight);
 
         _buffers.keypoints = new GraphicsBuffer
           (GraphicsBuffer.Target.Structured,
-           KeypointCount, sizeof(float) * 4);
+           Body.KeypointCount, sizeof(float) * 4);
+
+        // Keypoint data read cache initialization
+        _readCache = new KeypointCache(_buffers.keypoints);
     }
 
     void DeallocateObjects()
@@ -144,6 +149,9 @@ public sealed class BodyPixRuntime : System.IDisposable
         post2.SetInt("Stride", _config.Stride);
         post2.SetBuffer(0, "Keypoints", _buffers.keypoints);
         post2.Dispatch(0, 1, 1, 1);
+
+        // Cache data invalidation
+        _readCache.Invalidate();
     }
 
     #endregion

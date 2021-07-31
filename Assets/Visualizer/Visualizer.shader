@@ -124,7 +124,7 @@ Shader "Hidden/BodyPix/Visualizer"
         float x = lerp(-0.5, 0.5, key.x) * _Aspect;
         float y = lerp(-0.5, 0.5, key.y);
 
-        const float threshold = 0.5;
+        const float threshold = 0.3;
         bool mask = key.z > threshold;
 
         position = UnityObjectToClipPos(float4(x, y, 1, 1));
