@@ -40,14 +40,14 @@ sealed class Visualizer : MonoBehaviour
         _bodypix.ProcessImage(_source.Texture);
         _previewUI.texture = _source.Texture;
 
-        Graphics.Blit(_bodypix.Mask, _mask, _material, 0);
+        Graphics.Blit(_bodypix.MaskTexture, _mask, _material, 0);
     }
 
     void OnRenderObject()
     {
         if (!_drawSkeleton) return;
 
-        _material.SetBuffer("_Keypoints", _bodypix.Keypoints);
+        _material.SetBuffer("_Keypoints", _bodypix.KeypointBuffer);
         _material.SetFloat("_Aspect", (float)_resolution.x / _resolution.y);
 
         _material.SetPass(1);

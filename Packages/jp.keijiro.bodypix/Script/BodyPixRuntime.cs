@@ -20,10 +20,10 @@ public sealed class BodyPixRuntime : System.IDisposable
     public void ProcessImage(Texture sourceTexture)
       => RunModel(sourceTexture);
 
-    public RenderTexture Mask
+    public RenderTexture MaskTexture
       => _buffers.mask;
 
-    public GraphicsBuffer Keypoints
+    public GraphicsBuffer KeypointBuffer
       => _buffers.keypoints;
 
     #endregion
