@@ -25,3 +25,58 @@ See [the Colab notebook] for further details.
 [tf2onnx]: https://github.com/onnx/tensorflow-onnx
 [the Colab notebook]:
   https://colab.research.google.com/drive/1ikOMoqOX7TSBNId0lGaQ_kIyDF2GV3M3?usp=sharing
+
+ResNet support
+--------------
+
+This package supports the ResNet architecture (more accurate but slower and bigger models)
+but doesn't contain those ONNX files due to the file size limit of GitHub and npm.js.
+You can download them from [here][ResNetZip] instead.
+
+To use those models, create a new BodyPix ResourceSet file and set the model, architecture,
+and stride fields accordingly.
+
+![ResNet50](https://user-images.githubusercontent.com/343936/127449759-a5294794-4a60-454c-8f9d-7899c14b0d48.png)
+
+[ResNetZip]:
+  https://github.com/keijiro/BodyPixBarracuda/releases/download/1.0.3/ResNet50Models.zip
+
+How to install
+--------------
+
+This package uses the [scoped registry] feature to resolve package dependencies.
+Please add the following sections to the manifest file (Packages/manifest.json).
+
+[scoped registry]: https://docs.unity3d.com/Manual/upm-scoped.html
+
+To the `scopedRegistries` section:
+
+```
+{
+  "name": "Keijiro",
+  "url": "https://registry.npmjs.com",
+  "scopes": [ "jp.keijiro" ]
+}
+```
+
+To the `dependencies` section:
+
+```
+"jp.keijiro.bodypix": "2.0.0"
+```
+
+After changes, the manifest file should look like below:
+
+```
+{
+  "scopedRegistries": [
+    {
+      "name": "Keijiro",
+      "url": "https://registry.npmjs.com",
+      "scopes": [ "jp.keijiro" ]
+    }
+  ],
+  "dependencies": {
+    "jp.keijiro.bodypix": "2.0.0",
+...
+```
