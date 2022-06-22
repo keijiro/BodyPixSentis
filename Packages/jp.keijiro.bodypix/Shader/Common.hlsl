@@ -112,7 +112,7 @@ float BodyPix_EvalSegmentation(const in BodyPix_Mask mask)
 // Evaludate a part value of sample data
 float BodyPix_EvalPart(const in BodyPix_Mask mask, uint part_id)
 {
-    uint4 flags = (uint4)(mask.part * BODYPIX_PART_COUNT) == part_id;
+    uint4 flags = (uint4)(mask.part * BODYPIX_PART_COUNT + 0.5) == part_id;
     return BodyPix_Bilinear(flags, mask.offs);
 }
 
