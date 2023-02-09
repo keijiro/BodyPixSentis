@@ -10,6 +10,6 @@
   ],
   "dependencies": {
     "com.unity.ugui": "1.0.0",
-    "jp.keijiro.klak.testtools": "1.0.3"
+    "jp.keijiro.klak.testtools": "1.0.4"
   }
 }
