@@ -3,26 +3,41 @@
 #include "Common.hlsl"
 
 // Input
-Texture2D<float> Segments;
-Texture2D<float> Heatmaps;
+StructuredBuffer<float> Segments;
+StructuredBuffer<float> Heatmaps;
 uint2 InputSize;
 
 // Output
 RWTexture2D<float4> Output;
+
+uint GetLinearOffset(uint x, uint y)
+{
+    return (InputSize.y - 1 - y) * InputSize.x + x;
+}
+
+float SampleSegment(uint x, uint y)
+{
+    return Segments[GetLinearOffset(x, y)];
+}
+
+float SampleHeatmap(uint x, uint y, uint index)
+{
+    return Heatmaps[index + BODYPIX_PART_COUNT * GetLinearOffset(x, y)];
+}
 
 [numthreads(8, 8, 1)]
 void PostprocessMask(uint2 id : SV_DispatchThreadID)
 {
     if (!all(id < InputSize)) return;
 
-    float s = BodyPix_Sigmoid(Segments[id]);
+    float s = BodyPix_Sigmoid(SampleSegment(id.x, id.y));
 
-    float max_h = Heatmaps[id * uint2(BODYPIX_PART_COUNT, 1)];
+    float max_h = SampleHeatmap(id.x, id.y, 0);
     uint max_i = 0;
 
     for (uint i = 1; i < BODYPIX_PART_COUNT; i++)
     {
-        float h = Heatmaps[uint2(id.x * BODYPIX_PART_COUNT + i, id.y)];
+        float h = SampleHeatmap(id.x, id.y, i);
         if (h > max_h)
         {
             max_h = h;
