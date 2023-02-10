@@ -11,6 +11,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.barracuda",
+            "expression": "4.0.0",
+            "define": "BARRACUDA_4_0_0_OR_LATER"
+        }
+    ],
     "noEngineReferences": false
 }

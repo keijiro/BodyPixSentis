@@ -64,9 +64,15 @@ static class IWorkerExtensions
       (this IWorker worker, string tensorName, RenderTexture rt)
     {
         var output = worker.PeekOutput(tensorName);
+#if BARRACUDA_4_0_0_OR_LATER
+        var shape = new TensorShape(1, 1, rt.height, rt.width);
+        using var tensor = output.ShallowReshape(shape);
+        TensorToRenderTexture.ToRenderTexture((TensorFloat)tensor, rt);
+#else
         var shape = new TensorShape(1, rt.height, rt.width, 1);
         using var tensor = output.Reshape(shape);
         tensor.ToRenderTexture(rt);
+#endif
     }
 }
 

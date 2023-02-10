@@ -34,8 +34,9 @@ public sealed class BodyDetector : System.IDisposable
     Config _config;
     IWorker _worker;
 
-    (ComputeBuffer preprocess,
-     RenderTexture segment,
+    (Tensor tensor, ComputeTensorData data) _preprocess;
+
+    (RenderTexture segment,
      RenderTexture parts,
      RenderTexture heatmaps,
      RenderTexture offsets,
@@ -52,11 +53,20 @@ public sealed class BodyDetector : System.IDisposable
         // Private object initialization
         _resources = resources;
         _config = new Config(model, _resources, width, height);
-        _worker = model.CreateWorker();
+        _worker = model.CreateWorker(WorkerFactory.Device.GPU);
 
         // Buffer allocation
-        _buffers.preprocess = new ComputeBuffer
-          (_config.InputFootprint, sizeof(float));
+#if BARRACUDA_4_0_0_OR_LATER
+        _preprocess.data = new ComputeTensorData
+          (_config.InputShape, "Preprocess", false);
+        _preprocess.tensor = TensorFloat.Zeros(_config.InputShape);
+        _preprocess.tensor.AttachToDevice(_preprocess.data);
+#else
+        _preprocess.data = new ComputeTensorData
+          (_config.InputShape, "Preprocess",
+           ComputeInfo.ChannelsOrder.NHWC, false);
+        _preprocess.tensor = new Tensor(_config.InputShape, _preprocess.data);
+#endif
 
         _buffers.segment = RTUtil.NewFloat
           (_config.OutputWidth, _config.OutputHeight);
@@ -86,8 +96,8 @@ public sealed class BodyDetector : System.IDisposable
         _worker?.Dispose();
         _worker = null;
 
-        _buffers.preprocess?.Dispose();
-        _buffers.preprocess = null;
+        _preprocess.tensor?.Dispose();
+        _preprocess = (null, null);
 
         ObjectUtil.Destroy(_buffers.segment);
         _buffers.segment = null;
@@ -117,15 +127,14 @@ public sealed class BodyDetector : System.IDisposable
         // Preprocessing
         var pre = _resources.preprocess;
         pre.SetTexture(0, "Input", source);
-        pre.SetBuffer(0, "Output", _buffers.preprocess);
+        pre.SetBuffer(0, "Output", _preprocess.data.buffer);
         pre.SetInts("InputSize", _config.InputWidth, _config.InputHeight);
         pre.SetVector("ColorCoeffs", _config.PreprocessCoeffs);
         pre.SetBool("InputIsLinear", ColorUtil.IsLinear);
         pre.DispatchThreads(0, _config.InputWidth, _config.InputHeight, 1);
 
         // NN worker invocation
-        using (var t = new Tensor(_config.InputShape, _buffers.preprocess))
-            _worker.Execute(t);
+        _worker.Execute(_preprocess.tensor);
 
         // NN output retrieval
         _worker.CopyOutput("segments", _buffers.segment);
