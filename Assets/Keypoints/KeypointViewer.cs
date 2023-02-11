@@ -2,7 +2,6 @@ using UnityEngine;
 using UI = UnityEngine.UI;
 using Klak.TestTools;
 using BodyPix;
-using System.Linq;
 
 public sealed class KeypointViewer : MonoBehaviour
 {
@@ -45,7 +44,7 @@ public sealed class KeypointViewer : MonoBehaviour
         var rectSize = _previewUI.rectTransform.rect.size;
         for (var i = 0; i < Body.KeypointCount; i++)
         {
-            var key = _detector.Keypoints.ElementAt(i);
+            var key = _detector.Keypoints[i];
             var (xform, label) = _markers[i];
 
             // Visibility

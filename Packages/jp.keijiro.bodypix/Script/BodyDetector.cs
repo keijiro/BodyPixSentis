@@ -17,7 +17,7 @@ public sealed class BodyDetector : System.IDisposable
     public void ProcessImage(Texture sourceTexture)
       => RunModel(sourceTexture);
 
-    public IEnumerable<Keypoint> Keypoints
+    public System.ReadOnlySpan<Keypoint> Keypoints
       => _readCache.Cached;
 
     public RenderTexture MaskTexture
@@ -49,14 +49,12 @@ public sealed class BodyDetector : System.IDisposable
 
         // Preprocessing buffers
 #if BARRACUDA_4_0_0_OR_LATER
-        _preprocess.data =
-          new ComputeTensorData(_config.InputShape, "Preprocess", false);
+        _preprocess.data = new ComputeTensorData(_config.InputShape, "Input", false);
         _preprocess.tensor = TensorFloat.Zeros(_config.InputShape);
         _preprocess.tensor.AttachToDevice(_preprocess.data);
 #else
-        _preprocess.data =
-          new ComputeTensorData(_config.InputShape, "Preprocess",
-                                ComputeInfo.ChannelsOrder.NHWC, false);
+        _preprocess.data = new ComputeTensorData
+          (_config.InputShape, "Input", ComputeInfo.ChannelsOrder.NHWC, false);
         _preprocess.tensor = new Tensor(_config.InputShape, _preprocess.data);
 #endif
 
@@ -77,10 +75,8 @@ public sealed class BodyDetector : System.IDisposable
         _preprocess = (null, null);
 
         BufferUtil.Destroy(_output.mask);
-        _output.mask = null;
-
         _output.keypoints?.Dispose();
-        _output.keypoints = null;
+        _output = (null, null);
     }
 
     #endregion

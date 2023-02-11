@@ -67,19 +67,19 @@ static class IWorkerExtensions
 sealed class KeypointCache
 {
     public KeypointCache(GraphicsBuffer source) => _source = source;
-    public Keypoint[] Cached => Read();
+    public System.ReadOnlySpan<Keypoint> Cached => Read();
     public void Invalidate() => _isCached = false;
 
     GraphicsBuffer _source;
-    Keypoint[] _array = new Keypoint[Body.KeypointCount];
+    Keypoint[] _cache = new Keypoint[Body.KeypointCount];
     bool _isCached;
 
-    Keypoint[] Read()
+    System.ReadOnlySpan<Keypoint> Read()
     {
-        if (_isCached) return _array;
-        _source.GetData(_array, 0, 0, Body.KeypointCount);
+        if (_isCached) return _cache;
+        _source.GetData(_cache, 0, 0, Body.KeypointCount);
         _isCached = true;
-        return _array;
+        return _cache;
     }
 }
 
