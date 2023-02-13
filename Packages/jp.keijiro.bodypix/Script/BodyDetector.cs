@@ -1,6 +1,7 @@
-using System.Collections.Generic;
 using Unity.Barracuda;
 using UnityEngine;
+using Klak.NNUtils;
+using Klak.NNUtils.Extensions;
 
 namespace BodyPix {
 
@@ -33,37 +34,31 @@ public sealed class BodyDetector : System.IDisposable
     ResourceSet _resources;
     Config _config;
     IWorker _worker;
-    (Tensor tensor, ComputeTensorData data) _preprocess;
+    ImagePreprocess _preprocess;
     (RenderTexture mask, GraphicsBuffer keypoints) _output;
-    KeypointCache _readCache;
+    BufferReader<Keypoint> _readCache;
 
     void AllocateObjects(ResourceSet resources, int width, int height)
     {
-        // NN model
-        var model = ModelLoader.Load(resources.model);
-
-        // Private objects
         _resources = resources;
+
+        // NN model
+        var model = ModelLoader.Load(_resources.model);
         _config = new Config(model, _resources, width, height);
+
+        // GPU worker
         _worker = model.CreateWorker(WorkerFactory.Device.GPU);
 
         // Preprocessing buffers
-#if BARRACUDA_4_0_0_OR_LATER
-        _preprocess.data = new ComputeTensorData(_config.InputShape, "Input", false);
-        _preprocess.tensor = TensorFloat.Zeros(_config.InputShape);
-        _preprocess.tensor.AttachToDevice(_preprocess.data);
-#else
-        _preprocess.data = new ComputeTensorData
-          (_config.InputShape, "Input", ComputeInfo.ChannelsOrder.NHWC, false);
-        _preprocess.tensor = new Tensor(_config.InputShape, _preprocess.data);
-#endif
+        _preprocess = new ImagePreprocess(_config.InputWidth, _config.InputHeight)
+          { ColorCoeffs = _config.PreprocessCoeffs };
 
         // Output buffers
-        _output.mask = BufferUtil.NewArgbUav(_config.OutputWidth, _config.OutputHeight);
-        _output.keypoints = BufferUtil.NewFloat4(Body.KeypointCount);
+        _output.mask = RTUtil.NewArgbUav(_config.OutputWidth, _config.OutputHeight);
+        _output.keypoints = BufferUtil.NewStructured<Vector4>(Body.KeypointCount);
 
-        // Keypoint read cache
-        _readCache = new KeypointCache(_output.keypoints);
+        // Read cache
+        _readCache = new BufferReader<Keypoint>(_output.keypoints, Body.KeypointCount);
     }
 
     void DeallocateObjects()
@@ -71,10 +66,10 @@ public sealed class BodyDetector : System.IDisposable
         _worker?.Dispose();
         _worker = null;
 
-        _preprocess.tensor?.Dispose();
-        _preprocess = (null, null);
+        _preprocess?.Dispose();
+        _preprocess = null;
 
-        BufferUtil.Destroy(_output.mask);
+        RTUtil.Destroy(_output.mask);
         _output.keypoints?.Dispose();
         _output = (null, null);
     }
@@ -86,16 +81,10 @@ public sealed class BodyDetector : System.IDisposable
     void RunModel(Texture source)
     {
         // Preprocessing
-        var pre = _resources.preprocess;
-        pre.SetTexture(0, "Input", source);
-        pre.SetBuffer(0, "Output", _preprocess.data.buffer);
-        pre.SetInts("InputSize", _config.InputWidth, _config.InputHeight);
-        pre.SetVector("ColorCoeffs", _config.PreprocessCoeffs);
-        pre.SetBool("InputIsLinear", ColorUtil.IsLinear);
-        pre.DispatchThreads(0, _config.InputWidth, _config.InputHeight, 1);
+        _preprocess.Dispatch(source, _resources.preprocess);
 
         // NN worker invocation
-        _worker.Execute(_preprocess.tensor);
+        _worker.Execute(_preprocess.Tensor);
 
         // Postprocessing (mask)
         var post1 = _resources.mask;
@@ -115,7 +104,7 @@ public sealed class BodyDetector : System.IDisposable
         post2.Dispatch(0, 1, 1, 1);
 
         // Cache data invalidation
-        _readCache.Invalidate();
+        _readCache.InvalidateCache();
     }
 
     #endregion

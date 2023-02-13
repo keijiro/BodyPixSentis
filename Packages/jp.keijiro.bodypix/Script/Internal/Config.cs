@@ -31,13 +31,6 @@ struct Config
 
     #endregion
 
-    #region Tensor shape utilities
-
-    public TensorShape InputShape
-      => new TensorShape(1, InputHeight, InputWidth, 3);
-
-    #endregion
-
     #region Constructor
 
     public Config(Model model, ResourceSet resources, int width, int height)

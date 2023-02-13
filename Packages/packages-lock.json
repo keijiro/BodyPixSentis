@@ -41,8 +41,18 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "com.unity.barracuda": "3.0.0"
+        "com.unity.barracuda": "3.0.0",
+        "jp.keijiro.klak.nnutils": "1.0.0"
       }
+    },
+    "jp.keijiro.klak.nnutils": {
+      "version": "1.0.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.barracuda": "3.0.0"
+      },
+      "url": "https://registry.npmjs.com"
     },
     "jp.keijiro.klak.testtools": {
       "version": "1.0.4",
