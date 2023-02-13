@@ -8,7 +8,7 @@ Shader "Hidden/BodyPix/Visualizer"
     CGINCLUDE
 
     #include "UnityCG.cginc"
-    #include "Packages/jp.keijiro.bodypix/Shader/Common.hlsl"
+    #include "Packages/jp.keijiro.bodypix/Shaders/Common.hlsl"
 
     float3 HueToRGB(float h)
     {
