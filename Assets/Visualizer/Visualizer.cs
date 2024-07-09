@@ -37,8 +37,8 @@ public sealed class Visualizer : MonoBehaviour
 
     void LateUpdate()
     {
-        _detector.ProcessImage(_source.Texture);
-        _previewUI.texture = _source.Texture;
+        _detector.ProcessImage(_source.AsTexture);
+        _previewUI.texture = _source.AsTexture;
 
         Graphics.Blit(_detector.MaskTexture, _mask, _material, 0);
     }
