@@ -4,12 +4,12 @@
     "com.unity.sentis": "2.1.0",
     "jp.keijiro.klak.nnutils": "2.0.0"
   },
-  "description": "BodyPix person segmentation and pose estimation model for Unity Barracuda.",
+  "description": "BodyPix person segmentation and pose estimation model for Unity Sentis.",
   "displayName": "BodyPix",
   "keywords": [ "unity" ],
   "license": "Apache-2.0",
   "name": "jp.keijiro.bodypix",
-  "repository": "github:keijiro/BodyPixBarracuda",
+  "repository": "github:keijiro/BodyPixSentis",
   "unity": "2020.3",
   "unityRelease": "0f1",
   "version": "2.2.0"

@@ -1,14 +1,14 @@
-BodyPixBarracuda
-================
+BodyPixSentis
+=============
 
 ![gif](https://user-images.githubusercontent.com/343936/126066328-9bb01b01-d16f-4a38-8b7e-fb463bd0aac2.gif)
 ![gif](https://user-images.githubusercontent.com/343936/126066334-c8d7ea3f-a1b2-49c0-b094-cf55d8f80610.gif)
 
-**BodyPixBarracuda** is an implementation of the [BodyPix] person segmentation and pose estimation model
-that runs on the [Unity Barracuda] neural network inference library.
+**BodyPixSentis** is an implementation of the [BodyPix] person segmentation and pose estimation model
+that runs on the [Unity Sentis] neural network inference library.
 
 [BodyPix]: https://blog.tensorflow.org/2019/11/updated-bodypix-2.html
-[Unity Barracuda]: https://docs.unity3d.com/Packages/com.unity.barracuda@latest
+[Unity Sentis]: https://docs.unity3d.com/Packages/com.unity.sentis@latest
 
 System requirements
 -------------------
@@ -39,7 +39,7 @@ and stride fields accordingly.
 ![ResNet50](https://user-images.githubusercontent.com/343936/127449759-a5294794-4a60-454c-8f9d-7899c14b0d48.png)
 
 [ResNetZip]:
-  https://github.com/keijiro/BodyPixBarracuda/releases/download/1.0.3/ResNet50Models.zip
+  https://github.com/keijiro/BodyPixSentis/releases/download/1.0.3/ResNet50Models.zip
 
 How to install
 --------------

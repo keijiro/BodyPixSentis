@@ -1,5 +1,5 @@
-#ifndef _BODYPIX_BARRACUDA_COMMON_H_
-#define _BODYPIX_BARRACUDA_COMMON_H_
+#ifndef _BODYPIX_SENTIS_COMMON_H_
+#define _BODYPIX_SENTIS_COMMON_H_
 
 // Keypoint IDs
 #define BODYPIX_KEYPOINT_NOSE               0
