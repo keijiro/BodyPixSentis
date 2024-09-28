@@ -1,5 +1,5 @@
 using UnityEngine;
-using Unity.Barracuda;
+using Unity.Sentis;
 
 namespace BodyPix {
 
@@ -9,7 +9,7 @@ public enum Architecture { MobileNetV1, ResNet50 }
                  menuName = "ScriptableObjects/BodyPix Resource Set")]
 public sealed class ResourceSet : ScriptableObject
 {
-    public NNModel model;
+    public ModelAsset model;
     public Architecture architecture;
     public int stride = 8;
     public ComputeShader preprocess;

@@ -1,4 +1,4 @@
-using Unity.Barracuda;
+using Unity.Sentis;
 using UnityEngine;
 using Klak.NNUtils;
 using Klak.NNUtils.Extensions;
@@ -33,7 +33,7 @@ public sealed class BodyDetector : System.IDisposable
 
     ResourceSet _resources;
     Config _config;
-    IWorker _worker;
+    Worker _worker;
     ImagePreprocess _preprocess;
     (RenderTexture mask, GraphicsBuffer keypoints) _output;
     BufferReader<Keypoint> _readCache;
@@ -47,7 +47,7 @@ public sealed class BodyDetector : System.IDisposable
         _config = new Config(model, _resources, width, height);
 
         // GPU worker
-        _worker = model.CreateWorker(WorkerFactory.Device.GPU);
+        _worker = new Worker(model, BackendType.GPUCompute);
 
         // Preprocessing buffers
         _preprocess = new ImagePreprocess(_config.InputWidth, _config.InputHeight)
@@ -84,7 +84,7 @@ public sealed class BodyDetector : System.IDisposable
         _preprocess.Dispatch(source, _resources.preprocess);
 
         // NN worker invocation
-        _worker.Execute(_preprocess.Tensor);
+        _worker.Schedule(_preprocess.Tensor);
 
         // Postprocessing (mask)
         var post1 = _resources.mask;

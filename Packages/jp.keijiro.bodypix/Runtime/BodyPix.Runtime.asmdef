@@ -2,7 +2,7 @@
     "name": "BodyPix.Runtime",
     "rootNamespace": "",
     "references": [
-        "GUID:5c2b5ba89f9e74e418232e154bc5cc7a",
+        "GUID:c98377141161c7746a178fb5cb1af075",
         "GUID:41c681fd50d45474baa3849629cd7f0f"
     ],
     "includePlatforms": [],

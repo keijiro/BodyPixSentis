@@ -1,8 +1,8 @@
 {
   "author": "Keijiro Takahashi",
   "dependencies": {
-    "com.unity.barracuda": "3.0.0",
-    "jp.keijiro.klak.nnutils": "1.0.0"
+    "com.unity.sentis": "2.1.0",
+    "jp.keijiro.klak.nnutils": "2.0.0"
   },
   "description": "BodyPix person segmentation and pose estimation model for Unity Barracuda.",
   "displayName": "BodyPix",
