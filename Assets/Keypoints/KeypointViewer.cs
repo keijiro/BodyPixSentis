@@ -37,8 +37,8 @@ public sealed class KeypointViewer : MonoBehaviour
     void LateUpdate()
     {
         // BodyPix detector update
-        _detector.ProcessImage(_source.Texture);
-        _previewUI.texture = _source.Texture;
+        _detector.ProcessImage(_source.AsTexture);
+        _previewUI.texture = _source.AsTexture;
 
         // Marker update
         var rectSize = _previewUI.rectTransform.rect.size;
