@@ -1,4 +1,4 @@
-using Unity.Sentis;
+using Unity.InferenceEngine;
 using UnityEngine;
 using Klak.NNUtils;
 using Klak.NNUtils.Extensions;

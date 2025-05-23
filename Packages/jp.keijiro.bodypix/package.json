@@ -1,9 +1,6 @@
 {
   "author": "Keijiro Takahashi",
-  "dependencies": {
-    "com.unity.sentis": "2.1.0",
-    "jp.keijiro.klak.nnutils": "2.0.0"
-  },
+  "dependencies": { "jp.keijiro.klak.nnutils": "3.0.0" },
   "description": "BodyPix person segmentation and pose estimation model for Unity Sentis.",
   "displayName": "BodyPix",
   "keywords": [ "unity" ],
