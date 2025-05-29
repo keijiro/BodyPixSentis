@@ -27,9 +27,9 @@ to ONNX using [tfjs-to-tf] and [tf2onnx]. For details, see [the Colab notebook].
 
 ## ResNet Model Support
 
-This package supports ResNet-based models, which offer higher accuracy but are  
-larger and slower. Due to GitHub and npm.js file size limits, these ONNX files  
-are not included in the repository. You can download them from  
+This package supports ResNet-based models, which offer higher accuracy but are
+larger and slower. Due to GitHub and npm.js file size limits, these ONNX files
+are not included in the repository. You can download them from
 [ResNetZip] instead.
 
 To use ResNet models, create a new BodyPix ResourceSet and set the model,
