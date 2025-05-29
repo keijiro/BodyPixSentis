@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.unity.ai.inference": {
-      "version": "2.2.0",
+      "version": "2.2.1",
       "depth": 2,
       "source": "registry",
       "dependencies": {
@@ -87,15 +87,15 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "jp.keijiro.klak.nnutils": "3.0.0"
+        "jp.keijiro.klak.nnutils": "3.0.1"
       }
     },
     "jp.keijiro.klak.nnutils": {
-      "version": "3.0.0",
+      "version": "3.0.1",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.ai.inference": "2.2.0"
+        "com.unity.ai.inference": "2.2.1"
       },
       "url": "https://registry.npmjs.com"
     },
