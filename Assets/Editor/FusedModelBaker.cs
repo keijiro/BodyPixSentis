@@ -5,10 +5,10 @@ using Unity.InferenceEngine;
 
 namespace BodyPix.Editor {
 
-static class Phase1ModelBaker
+static class FusedModelBaker
 {
-    const string MobileNetMenuPath = "Assets/BodyPix/Bake Phase1 (MobileNet)";
-    const string ResNetMenuPath = "Assets/BodyPix/Bake Phase1 (ResNet50)";
+    const string MobileNetMenuPath = "Assets/BodyPix/Bake Fused (MobileNet)";
+    const string ResNetMenuPath = "Assets/BodyPix/Bake Fused (ResNet50)";
     const string OutputDir = "Assets/StreamingAssets/BodyPix";
 
     static bool IsOnnxAsset(Object obj)
@@ -53,21 +53,21 @@ static class Phase1ModelBaker
             }
 
             var source = ModelLoader.Load(sourceAsset);
-            if (Phase1ModelBuilder.IsPhase1Model(source))
+            if (FusedModelBuilder.IsFusedModel(source))
             {
-                Debug.LogWarning("Selected ONNX is already a Phase1 model.", sourceAsset);
+                Debug.LogWarning("Selected ONNX is already a fused model.", sourceAsset);
                 continue;
             }
 
-            var edited = Phase1ModelBuilder.Build(source, architecture);
+            var edited = FusedModelBuilder.Build(source, architecture);
             var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
 
             var outPath = Path.Combine
-              (OutputDir, $"{sourceName}-Phase1-{suffix}.sentis");
+              (OutputDir, $"{sourceName}-Fused-{suffix}.sentis");
 
             ModelWriter.Save(outPath, edited);
             AssetDatabase.ImportAsset(outPath, ImportAssetOptions.ForceUpdate);
-            Debug.Log($"BodyPix Phase1 model baked: {outPath}", sourceAsset);
+            Debug.Log($"BodyPix fused model baked: {outPath}", sourceAsset);
         }
     }
 }

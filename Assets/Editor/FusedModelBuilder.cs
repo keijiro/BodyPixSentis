@@ -6,7 +6,7 @@ namespace BodyPix.Editor {
 
 enum ModelArchitecture { MobileNetV1, ResNet50 }
 
-static class Phase1ModelBuilder
+static class FusedModelBuilder
 {
     static bool HasOutput(Model model, string name)
     {
@@ -30,7 +30,7 @@ static class Phase1ModelBuilder
          new Vector4(-1, -1, -1, 2) :
          new Vector4(-123.15f, -115.90f, -103.06f, 255);
 
-    public static bool IsPhase1Model(Model model)
+    public static bool IsFusedModel(Model model)
       => HasOutput(model, "mask") &&
          HasOutput(model, "heatmaps") &&
          HasOutput(model, "short_offsets") &&

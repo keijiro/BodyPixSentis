@@ -44,7 +44,7 @@ public sealed class BodyDetector : System.IDisposable
     {
         _resources = resources;
 
-        // NN model (assumed to be pre-baked Phase1)
+        // NN model
         var model = ModelLoader.Load(_resources.model);
         _config = new Config(_resources, width, height);
 
