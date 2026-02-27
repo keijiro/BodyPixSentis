@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -51,4 +50,3 @@ static class Phase1ModelBaker
 }
 
 } // namespace BodyPix.Editor
-#endif

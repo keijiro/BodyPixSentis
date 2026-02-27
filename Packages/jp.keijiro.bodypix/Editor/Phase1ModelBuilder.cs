@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System.Collections.Generic;
 using Unity.InferenceEngine;
 using UnityEngine;
@@ -65,4 +64,3 @@ static class Phase1ModelBuilder
 }
 
 } // namespace BodyPix.Editor
-#endif
