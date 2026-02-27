@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace BodyPix.Editor {
 
+enum ModelArchitecture { MobileNetV1, ResNet50 }
+
 static class Phase1ModelBuilder
 {
     static bool HasOutput(Model model, string name)
@@ -23,8 +25,8 @@ static class Phase1ModelBuilder
         throw new KeyNotFoundException($"Output '{name}' was not found.");
     }
 
-    static Vector4 GetPreprocessCoeffs(Architecture architecture)
-      => architecture == Architecture.MobileNetV1 ?
+    static Vector4 GetPreprocessCoeffs(ModelArchitecture architecture)
+      => architecture == ModelArchitecture.MobileNetV1 ?
          new Vector4(-1, -1, -1, 2) :
          new Vector4(-123.15f, -115.90f, -103.06f, 255);
 
@@ -34,7 +36,7 @@ static class Phase1ModelBuilder
          HasOutput(model, "short_offsets") &&
          !HasOutput(model, "segments");
 
-    public static Model Build(Model sourceModel, Architecture architecture)
+    public static Model Build(Model sourceModel, ModelArchitecture architecture)
     {
         var graph = new FunctionalGraph();
         var input = graph.AddInput(sourceModel, 0);
