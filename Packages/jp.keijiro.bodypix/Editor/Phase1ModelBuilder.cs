@@ -1,10 +1,11 @@
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using Unity.InferenceEngine;
 using UnityEngine;
 
-namespace BodyPix {
+namespace BodyPix.Editor {
 
-public static class BodyPixModelFactory
+static class Phase1ModelBuilder
 {
     static bool HasOutput(Model model, string name)
     {
@@ -34,7 +35,7 @@ public static class BodyPixModelFactory
          HasOutput(model, "short_offsets") &&
          !HasOutput(model, "segments");
 
-    public static Model BuildPhase1Model(Model sourceModel, Architecture architecture)
+    public static Model Build(Model sourceModel, Architecture architecture)
     {
         var graph = new FunctionalGraph();
         var input = graph.AddInput(sourceModel, 0);
@@ -63,4 +64,5 @@ public static class BodyPixModelFactory
     }
 }
 
-} // namespace BodyPix
+} // namespace BodyPix.Editor
+#endif

@@ -3,18 +3,21 @@ using Unity.InferenceEngine;
 
 namespace BodyPix {
 
+#if UNITY_EDITOR
 public enum Architecture { MobileNetV1, ResNet50 }
+#endif
 
 [CreateAssetMenu(fileName = "BodyPix",
                  menuName = "ScriptableObjects/BodyPix Resource Set")]
 public sealed class ResourceSet : ScriptableObject
 {
     public ModelAsset model;
-    public Architecture architecture;
     public int stride = 8;
-    public ComputeShader preprocess;
-    public ComputeShader mask;
     public ComputeShader keypoints;
+
+#if UNITY_EDITOR
+    public Architecture architecture;
+#endif
 }
 
 } // namespace BodyPix

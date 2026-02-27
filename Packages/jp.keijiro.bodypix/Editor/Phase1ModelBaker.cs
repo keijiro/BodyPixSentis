@@ -32,14 +32,13 @@ static class Phase1ModelBaker
                 continue;
 
             var source = ModelLoader.Load(resources.model);
-            if (BodyPixModelFactory.IsPhase1Model(source))
+            if (Phase1ModelBuilder.IsPhase1Model(source))
             {
                 Debug.LogWarning("ResourceSet model is already a Phase1 model.", resources);
                 continue;
             }
 
-            var edited = BodyPixModelFactory.BuildPhase1Model
-              (source, resources.architecture);
+            var edited = Phase1ModelBuilder.Build(source, resources.architecture);
 
             var outPath = Path.Combine
               (OutputDir, $"{resources.name}-Phase1.sentis");

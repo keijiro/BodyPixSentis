@@ -44,13 +44,9 @@ public sealed class BodyDetector : System.IDisposable
     {
         _resources = resources;
 
-        // NN model (BodyPix + preprocess + mask postprocess)
-        var sourceModel = ModelLoader.Load(_resources.model);
-        _config = new Config(sourceModel, _resources, width, height);
-        var model = BodyPixModelFactory.IsPhase1Model(sourceModel) ?
-          sourceModel :
-          BodyPixModelFactory.BuildPhase1Model
-          (sourceModel, _resources.architecture);
+        // NN model (assumed to be pre-baked Phase1)
+        var model = ModelLoader.Load(_resources.model);
+        _config = new Config(_resources, width, height);
 
         // GPU worker
         _worker = new Worker(model, BackendType.GPUCompute);
