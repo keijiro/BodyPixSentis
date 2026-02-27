@@ -8,33 +8,18 @@ enum ModelArchitecture { MobileNetV1, ResNet50 }
 
 static class FusedModelBuilder
 {
-    static bool HasOutput(Model model, string name)
-    {
-        for (var i = 0; i < model.outputs.Count; i++)
-            if (model.outputs[i].name == name)
-                return true;
-        return false;
-    }
-
-    static FunctionalTensor GetOutputByName
-      (Model sourceModel, IReadOnlyList<FunctionalTensor> outputs, string name)
-    {
-        for (var i = 0; i < sourceModel.outputs.Count; i++)
-            if (sourceModel.outputs[i].name == name)
-                return outputs[i];
-        throw new KeyNotFoundException($"Output '{name}' was not found.");
-    }
-
     static Vector4 GetPreprocessCoeffs(ModelArchitecture architecture)
       => architecture == ModelArchitecture.MobileNetV1 ?
          new Vector4(-1, -1, -1, 2) :
          new Vector4(-123.15f, -115.90f, -103.06f, 255);
 
-    public static bool IsFusedModel(Model model)
-      => HasOutput(model, "mask") &&
-         HasOutput(model, "heatmaps") &&
-         HasOutput(model, "short_offsets") &&
-         !HasOutput(model, "segments");
+    static FunctionalTensor GetOutputByName
+      (Model sourceModel, IReadOnlyList<FunctionalTensor> outputs, string name)
+    {
+        for (var i = 0; i < sourceModel.outputs.Count; i++)
+            if (sourceModel.outputs[i].name == name) return outputs[i];
+        throw new KeyNotFoundException($"Output '{name}' was not found.");
+    }
 
     public static Model Build(Model sourceModel, ModelArchitecture architecture)
     {

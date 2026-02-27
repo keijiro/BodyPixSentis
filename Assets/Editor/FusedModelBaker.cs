@@ -7,67 +7,50 @@ namespace BodyPix.Editor {
 
 static class FusedModelBaker
 {
+    // Menu items
+
     const string MobileNetMenuPath = "Assets/BodyPix/Bake Fused (MobileNet)";
     const string ResNetMenuPath = "Assets/BodyPix/Bake Fused (ResNet50)";
-    const string OutputDir = "Assets/StreamingAssets/BodyPix";
-
-    static bool IsOnnxAsset(Object obj)
-    {
-        var path = AssetDatabase.GetAssetPath(obj);
-        return Path.GetExtension(path).ToLowerInvariant() == ".onnx";
-    }
 
     [MenuItem(MobileNetMenuPath, true)]
-    static bool ValidateMobileNetBake()
-      => Selection.objects != null &&
-         System.Array.Exists(Selection.objects, IsOnnxAsset);
+    static bool ValidateMobileNetBake() => ValidateBake();
 
     [MenuItem(ResNetMenuPath, true)]
-    static bool ValidateResNetBake()
-      => Selection.objects != null &&
-         System.Array.Exists(Selection.objects, IsOnnxAsset);
+    static bool ValidateResNetBake() => ValidateBake();
 
     [MenuItem(MobileNetMenuPath)]
-    static void BakeMobileNet()
-      => Bake(ModelArchitecture.MobileNetV1, "MobileNet");
+    static void BakeMobileNet() => Bake(ModelArchitecture.MobileNetV1);
 
     [MenuItem(ResNetMenuPath)]
-    static void BakeResNet()
-      => Bake(ModelArchitecture.ResNet50, "ResNet50");
+    static void BakeResNet() => Bake(ModelArchitecture.ResNet50);
 
-    static void Bake(ModelArchitecture architecture, string suffix)
+    // Helpers
+
+    static bool IsOnnxAsset(Object obj)
+      => Path.GetExtension(AssetDatabase.GetAssetPath(obj)).ToLowerInvariant() == ".onnx";
+
+    static bool ValidateBake()
+      => Selection.objects != null && System.Array.Exists(Selection.objects, IsOnnxAsset);
+
+    // Fused model baker
+
+    static void Bake(ModelArchitecture architecture)
     {
-        Directory.CreateDirectory(Path.Combine(Application.dataPath, "StreamingAssets/BodyPix"));
-
         foreach (var obj in Selection.objects)
         {
-            if (!IsOnnxAsset(obj))
-                continue;
+            if (!IsOnnxAsset(obj)) continue;
 
             var sourcePath = AssetDatabase.GetAssetPath(obj);
-            var sourceAsset = AssetDatabase.LoadAssetAtPath<ModelAsset>(sourcePath);
-            if (sourceAsset == null)
-            {
-                Debug.LogWarning($"ModelAsset load failed: {sourcePath}", obj);
-                continue;
-            }
-
-            var source = ModelLoader.Load(sourceAsset);
-            if (FusedModelBuilder.IsFusedModel(source))
-            {
-                Debug.LogWarning("Selected ONNX is already a fused model.", sourceAsset);
-                continue;
-            }
-
-            var edited = FusedModelBuilder.Build(source, architecture);
             var sourceName = Path.GetFileNameWithoutExtension(sourcePath);
+            var sourceDir = Path.GetDirectoryName(sourcePath);
 
-            var outPath = Path.Combine
-              (OutputDir, $"{sourceName}-Fused-{suffix}.sentis");
+            var sourceAsset = AssetDatabase.LoadAssetAtPath<ModelAsset>(sourcePath);
+            var source = ModelLoader.Load(sourceAsset);
+            var edited = FusedModelBuilder.Build(source, architecture);
 
+            var outPath = Path.Combine(sourceDir, $"{sourceName}-Fused.sentis");
             ModelWriter.Save(outPath, edited);
             AssetDatabase.ImportAsset(outPath, ImportAssetOptions.ForceUpdate);
-            Debug.Log($"BodyPix fused model baked: {outPath}", sourceAsset);
         }
     }
 }
