@@ -1,13 +1,9 @@
-using Unity.InferenceEngine;
-using UnityEngine;
-
 namespace BodyPix {
 
 struct Config
 {
     #region Variables from tensor shapes
 
-    public Architecture Architecture { get; private set; }
     public int Stride { get; private set; }
     public int InputWidth { get; private set; }
     public int InputHeight { get; private set; }
@@ -16,26 +12,10 @@ struct Config
 
     #endregion
 
-    #region Coefficients for preprocessing
-
-    public Vector4 PreprocessCoeffs
-      => Architecture == Architecture.MobileNetV1 ?
-        new Vector4(-1, -1, -1, 2) :
-        new Vector4(-123.15f, -115.90f, -103.06f, 255);
-
-    #endregion
-
-    #region Data size calculation properties
-
-    public int InputFootprint => InputWidth * InputHeight * 3;
-
-    #endregion
-
     #region Constructor
 
-    public Config(Model model, ResourceSet resources, int width, int height)
+    public Config(ResourceSet resources, int width, int height)
     {
-        Architecture = resources.architecture;
         Stride = resources.stride;
         InputWidth  = (width  + 15) / 16 * 16 + 1;
         InputHeight = (height + 15) / 16 * 16 + 1;

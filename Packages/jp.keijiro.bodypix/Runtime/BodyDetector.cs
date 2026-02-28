@@ -34,7 +34,9 @@ public sealed class BodyDetector : System.IDisposable
     ResourceSet _resources;
     Config _config;
     Worker _worker;
-    ImagePreprocess _preprocess;
+    Tensor<float> _inputTensor;
+    TextureTransform _inputTransform;
+    TextureTransform _maskTransform;
     (RenderTexture mask, GraphicsBuffer keypoints) _output;
     BufferReader<Keypoint> _readCache;
 
@@ -44,14 +46,20 @@ public sealed class BodyDetector : System.IDisposable
 
         // NN model
         var model = ModelLoader.Load(_resources.model);
-        _config = new Config(model, _resources, width, height);
+        _config = new Config(_resources, width, height);
 
         // GPU worker
         _worker = new Worker(model, BackendType.GPUCompute);
 
-        // Preprocessing buffers
-        _preprocess = new ImagePreprocess(_config.InputWidth, _config.InputHeight)
-          { ColorCoeffs = _config.PreprocessCoeffs };
+        // Input tensor
+        _inputTensor = new Tensor<float>
+          (new TensorShape(1, _config.InputHeight, _config.InputWidth, 3));
+        _inputTransform = new TextureTransform()
+          .SetTensorLayout(TensorLayout.NHWC)
+          .SetCoordOrigin(CoordOrigin.TopLeft);
+        _maskTransform = new TextureTransform()
+          .SetTensorLayout(TensorLayout.NHWC)
+          .SetCoordOrigin(CoordOrigin.TopLeft);
 
         // Output buffers
         _output.mask = RTUtil.NewArgbUav(_config.OutputWidth, _config.OutputHeight);
@@ -66,8 +74,8 @@ public sealed class BodyDetector : System.IDisposable
         _worker?.Dispose();
         _worker = null;
 
-        _preprocess?.Dispose();
-        _preprocess = null;
+        _inputTensor?.Dispose();
+        _inputTensor = null;
 
         RTUtil.Destroy(_output.mask);
         _output.keypoints?.Dispose();
@@ -81,18 +89,14 @@ public sealed class BodyDetector : System.IDisposable
     void RunModel(Texture source)
     {
         // Preprocessing
-        _preprocess.Dispatch(source, _resources.preprocess);
+        TextureConverter.ToTensor(source, _inputTensor, _inputTransform);
 
         // NN worker invocation
-        _worker.Schedule(_preprocess.Tensor);
+        _worker.Schedule(_inputTensor);
 
-        // Postprocessing (mask)
-        var post1 = _resources.mask;
-        post1.SetBuffer(0, "Segments", _worker.PeekOutputBuffer("segments"));
-        post1.SetBuffer(0, "Heatmaps", _worker.PeekOutputBuffer("part_heatmaps"));
-        post1.SetTexture(0, "Output", _output.mask);
-        post1.SetInts("InputSize", _config.OutputWidth, _config.OutputHeight);
-        post1.DispatchThreads(0, _config.OutputWidth, _config.OutputHeight, 1);
+        // Postprocessing (mask via Sentis output tensor)
+        var maskTensor = _worker.PeekOutput("mask") as Tensor<float>;
+        TextureConverter.RenderToTexture(maskTensor, _output.mask, _maskTransform);
 
         // Postprocessing (keypoints)
         var post2 = _resources.keypoints;
@@ -108,6 +112,7 @@ public sealed class BodyDetector : System.IDisposable
     }
 
     #endregion
+
 }
 
 } // namespace BodyPix
