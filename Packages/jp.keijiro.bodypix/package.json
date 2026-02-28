@@ -1,13 +1,14 @@
 {
+  "name": "jp.keijiro.bodypix",
+  "version": "4.0.0",
+  "displayName": "BodyPix",
+  "description": "BodyPix person segmentation and pose estimation model for Unity Sentis.",
+  "unity": "2020.3",
   "author": "Keijiro Takahashi",
   "dependencies": { "jp.keijiro.klak.nnutils": "3.0.2" },
-  "description": "BodyPix person segmentation and pose estimation model for Unity Sentis.",
-  "displayName": "BodyPix",
-  "keywords": [ "unity" ],
+  "changelogUrl": "https://github.com/keijiro/BodyPixSentis/blob/main/Packages/jp.keijiro.bodypix/CHANGELOG.md",
+  "documentationUrl": "https://github.com/keijiro/BodyPixSentis",
+  "licensesUrl": "https://github.com/keijiro/BodyPixSentis/blob/main/LICENSE",
   "license": "Apache-2.0",
-  "name": "jp.keijiro.bodypix",
-  "repository": "github:keijiro/BodyPixSentis",
-  "unity": "2020.3",
-  "unityRelease": "0f1",
-  "version": "4.0.0"
+  "_upm": { "changelog": "" }
 }
