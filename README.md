@@ -85,7 +85,7 @@ GitHub and npm.js file size limits, ResNet ONNX files are not included in this
 repository. Download them from the [Releases page].
 
 [Releases page]:
-  https://github.com/keijiro/BodyPixSentis/releases/download/1.0.3/ResNet50Models.zip
+  https://github.com/keijiro/BodyPixSentis/releases/tag/5.0.0
 
 ## Model Conversion
 
