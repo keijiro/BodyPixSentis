@@ -1,14 +1,18 @@
 {
   "name": "jp.keijiro.bodypix",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "displayName": "BodyPix",
   "description": "BodyPix person segmentation and pose estimation model for Unity Sentis.",
   "unity": "2020.3",
   "author": "Keijiro Takahashi",
-  "dependencies": { "jp.keijiro.klak.nnutils": "3.0.2" },
+  "dependencies": {
+    "jp.keijiro.klak.nnutils": "3.0.2"
+  },
   "changelogUrl": "https://github.com/keijiro/BodyPixSentis/blob/main/Packages/jp.keijiro.bodypix/CHANGELOG.md",
   "documentationUrl": "https://github.com/keijiro/BodyPixSentis",
   "licensesUrl": "https://github.com/keijiro/BodyPixSentis/blob/main/LICENSE",
   "license": "Apache-2.0",
-  "_upm": { "changelog": "" }
+  "_upm": {
+    "changelog": "<b>Added</b><br>- Added fused model baking utilities and workflow scripts for generating runtime model assets.<br><br><b>Changed</b><br>- Replaced ONNX model assets with fused `.sentis` model files.<br>- Moved pre/postprocess steps into the fused model graph.<br>- Updated `jp.keijiro.klak.nnutils` dependency version.<br>- Updated README documentation."
+  }
 }
