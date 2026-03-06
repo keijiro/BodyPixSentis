@@ -6,6 +6,7 @@
   "unity": "2020.3",
   "author": "Keijiro Takahashi",
   "dependencies": {
+    "com.unity.ai.inference": "2.5.0",
     "jp.keijiro.klak.nnutils": "3.0.2"
   },
   "changelogUrl": "https://github.com/keijiro/BodyPixSentis/blob/main/Packages/jp.keijiro.bodypix/CHANGELOG.md",
